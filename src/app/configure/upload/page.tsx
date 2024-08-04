@@ -15,7 +15,7 @@ const Page = () => {
   const [uploadProgress, setuploadProgress] = useState<number>(0);
   const router = useRouter();
 
-  const { startUpload } = useUploadThing("imageUploader", {
+  const { startUpload, isUploading } = useUploadThing("imageUploader", {
     onClientUploadComplete: ([data]) => {
       const configId = data.serverData.configId;
       startTransition(() => {
@@ -27,7 +27,6 @@ const Page = () => {
     },
   });
 
-  const isUploading = false;
   const [isPending, startTransition] = useTransition();
 
   const onDropRejected = (rejectedFiles: FileRejection[]) => {
