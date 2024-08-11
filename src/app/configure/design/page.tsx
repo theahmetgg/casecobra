@@ -1,4 +1,3 @@
-// Veritabanı bağlantısını ve yardımcı fonksiyonları içe aktar
 import { db } from "@/db"; // Commit: `Veritabanı bağlantısını içe aktar`
 import { notFound } from "next/navigation"; // Commit: `notFound yardımcı fonksiyonunu içe aktar`
 import DesignConfigurator from "./DesignConfigurator"; // Commit: `DesignConfigurator bileşenini içe aktar`
@@ -28,7 +27,7 @@ const Page = async ({ searchParams }: PageProps) => {
   if (!configuration) {
     return notFound(); // Commit: `Konfigürasyon bulunamazsa 404 yanıtı döndür`
   }
-  
+
   // Konfigürasyondan gerekli özellikleri ayıkla
   const { imageUrl, width, height } = configuration; // Commit: `Konfigürasyon özelliklerini ayıkla`
 
