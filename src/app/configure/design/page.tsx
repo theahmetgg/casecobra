@@ -1,48 +1,37 @@
-import { db } from "@/db"; // Commit: `Veritabanı bağlantısını içe aktar`
-import { notFound } from "next/navigation"; // Commit: `notFound yardımcı fonksiyonunu içe aktar`
-import DesignConfigurator from "./DesignConfigurator"; // Commit: `DesignConfigurator bileşenini içe aktar`
+import { db } from "@/db";
+import { notFound } from "next/navigation";
+import DesignConfigurator from "./DesignConfigurator";
 
-// searchParams'in beklenen yapısını tanımlayan arayüz
 interface PageProps {
   searchParams: {
-    [key: string]: string | string[] | undefined; // Commit: `searchParams için PageProps arayüzünü tanımla`
+    [key: string]: string | string[] | undefined;
   };
 }
 
-// Ana Page bileşeni
 const Page = async ({ searchParams }: PageProps) => {
-  const { id } = searchParams; // Commit: `'id' parametresini searchParams'tan al`
+  const { id } = searchParams;
 
-  // 'id' eksikse veya string değilse işleme
   if (!id || typeof id !== "string") {
-    return notFound(); // Commit: `'id' geçerli değilse 404 yanıtı döndür`
+    return notFound();
   }
 
-  // 'id' kullanarak veritabanından konfigürasyonu al
   const configuration = await db.configuration.findUnique({
-    where: { id }, // Commit: `'id' ile veritabanında konfigürasyon sorgula`
+    where: { id },
   });
 
-  // Konfigürasyon bulunamazsa işleme
   if (!configuration) {
-    return notFound(); // Commit: `Konfigürasyon bulunamazsa 404 yanıtı döndür`
+    return notFound();
   }
 
-  // Konfigürasyondan gerekli özellikleri ayıkla
-  const { imageUrl, width, height } = configuration; // Commit: `Konfigürasyon özelliklerini ayıkla`
+  const { imageUrl, width, height } = configuration;
 
-  // DesignConfigurator bileşenini konfigürasyon verileri ile render et
   return (
     <DesignConfigurator
-      configId={configuration.id} // Commit: `DesignConfigurator bileşenine konfigürasyon ID'sini geçir`
-      imageDimensions={{
-        width, // Commit: `Görüntü genişliğini geçir`
-        height, // Commit: `Görüntü yüksekliğini geçir`
-      }}
-      imageUrl={imageUrl} // Commit: `Görüntü URL'sini geçir`
+      configId={configuration.id}
+      imageDimensions={{ width, height }}
+      imageUrl={imageUrl}
     />
   );
 };
 
-// Page bileşenini varsayılan olarak dışa aktar
-export default Page; // Commit: `Page bileşenini varsayılan olarak dışa aktar`
+export default Page;

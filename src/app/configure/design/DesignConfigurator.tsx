@@ -3,15 +3,17 @@
 import HandleComponent from "@/components/HandleComponent";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
 import { cn, formatPrice } from "@/lib/utils";
 import NextImage from "next/image";
-
 import { Rnd } from "react-rnd";
 import { RadioGroup } from "@headlessui/react";
 import { useRef, useState } from "react";
-import { COLORS, FINISHES, MATERIALS } from "@/validators/option-validator";
-import { MODELS } from "@/validators/option-validator";
+import {
+  COLORS,
+  FINISHES,
+  MATERIALS,
+  MODELS,
+} from "@/validators/option-validator";
 import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
@@ -24,6 +26,9 @@ import { ArrowRight, Check, ChevronsUpDown } from "lucide-react";
 import { BASE_PRICE } from "@/config/products";
 import { useUploadThing } from "@/lib/uploadthing";
 import { useToast } from "@/components/ui/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { saveConfig as _saveConfig, SaveConfigArgs } from "./actions";
+import { useRouter } from "next/navigation";
 
 interface DesignConfiguratorProps {
   configId: string;
@@ -37,6 +42,25 @@ const DesignConfigurator = ({
   imageDimensions,
 }: DesignConfiguratorProps) => {
   const { toast } = useToast();
+  const router = useRouter();
+
+  const { mutate: saveConfig, isPending } = useMutation({
+    mutationKey: ["save-config"],
+    mutationFn: async (args: SaveConfigArgs) => {
+      await Promise.all([saveConfiguration(), _saveConfig(args)]);
+    },
+    onError: () => {
+      toast({
+        title: "Something went wrong",
+        description: "There was an error on our end. Please try again.",
+        variant: "destructive",
+      });
+    },
+    onSuccess: () => {
+      router.push(`/configure/preview?id=${configId}`);
+    },
+  });
+
   const [options, setOptions] = useState<{
     color: (typeof COLORS)[number];
     model: (typeof MODELS.options)[number];
@@ -72,11 +96,13 @@ const DesignConfigurator = ({
         width,
         height,
       } = phoneCaseRef.current!.getBoundingClientRect();
+
       const { left: containerLeft, top: containerTop } =
         containerRef.current!.getBoundingClientRect();
 
       const leftOffset = caseLeft - containerLeft;
       const topOffset = caseTop - containerTop;
+
       const actualX = renderedPosition.x - leftOffset;
       const actualY = renderedPosition.y - topOffset;
 
@@ -109,7 +135,7 @@ const DesignConfigurator = ({
       toast({
         title: "Something went wrong",
         description:
-          "There was a problem saving your config, Please try again.",
+          "There was a problem saving your config, please try again.",
         variant: "destructive",
       });
     }
@@ -124,6 +150,7 @@ const DesignConfigurator = ({
     const byteArray = new Uint8Array(byteNumbers);
     return new Blob([byteArray], { type: mimeType });
   }
+
   return (
     <div className="relative mt-20 grid grid-cols-1 lg:grid-cols-3 mb-20 pb-20">
       <div
@@ -143,13 +170,11 @@ const DesignConfigurator = ({
               className="pointer-events-none z-50 select-none"
             />
           </AspectRatio>
-
           <div className="absolute z-40 inset-0 left-[3px] top-px right-[3px] bottom-px rounded-[32px] shadow-[0_0_0_99999px_rgba(229,231,235,0.6)]" />
-
           <div
             className={cn(
               "absolute inset-0 left-[3px] top-px right-[3px] bottom-px rounded-[32px]",
-              ` bg-${options.color.tw}`,
+              `bg-${options.color.tw}`,
             )}
           />
         </div>
@@ -166,6 +191,7 @@ const DesignConfigurator = ({
               height: parseInt(ref.style.height.slice(0, -2)),
               width: parseInt(ref.style.width.slice(0, -2)),
             });
+
             setRenderedPosition({ x, y });
           }}
           onDragStop={(_, data) => {
@@ -183,7 +209,7 @@ const DesignConfigurator = ({
         >
           <div className="relative w-full h-full">
             <NextImage
-              src={imageUrl} // Kullanıcının yüklediği görüntünün URL'si
+              src={imageUrl}
               fill
               alt="your image"
               className="pointer-events-none"
@@ -198,11 +224,14 @@ const DesignConfigurator = ({
             aria-hidden="true"
             className="absolute z-10 inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white pointer-events-none"
           />
+
           <div className="px-8 pb-12 pt-8">
             <h2 className="tracking-tight font-bold text-3xl">
               Customize your case
             </h2>
+
             <div className="w-full h-px bg-zinc-200 my-6" />
+
             <div className="relative mt-4 h-full flex flex-col justify-between">
               <div className="flex flex-col gap-6">
                 <RadioGroup
@@ -214,7 +243,7 @@ const DesignConfigurator = ({
                     }));
                   }}
                 >
-                  <Label>Color:{options.color.label}</Label>
+                  <Label>Color: {options.color.label}</Label>
                   <div className="mt-3 flex items-center space-x-3">
                     {COLORS.map((color) => (
                       <RadioGroup.Option
@@ -239,6 +268,7 @@ const DesignConfigurator = ({
                     ))}
                   </div>
                 </RadioGroup>
+
                 <div className="relative flex flex-col gap-3 w-full">
                   <Label>Model</Label>
                   <DropdownMenu>
@@ -319,6 +349,7 @@ const DesignConfigurator = ({
                                 >
                                   {option.label}
                                 </RadioGroup.Label>
+
                                 {option.description ? (
                                   <RadioGroup.Description
                                     as="span"
@@ -362,11 +393,23 @@ const DesignConfigurator = ({
                 )}
               </p>
               <Button
-                onClick={() => saveConfiguration()}
+                isLoading={isPending}
+                disabled={isPending}
+                loadingText="Saving"
+                onClick={() =>
+                  saveConfig({
+                    configId,
+                    color: options.color.value,
+                    finish: options.finish.value,
+                    material: options.material.value,
+                    model: options.model.value,
+                  })
+                }
                 size="sm"
                 className="w-full"
               >
-                Continue <ArrowRight className="h-4 w-4 ml-1.5 inline" />
+                Continue
+                <ArrowRight className="h-4 w-4 ml-1.5 inline" />
               </Button>
             </div>
           </div>
