@@ -53,7 +53,7 @@ model Configuration {
 
 model User {
   id    String  @id @default(cuid())
-  email String
+  email String  @unique
   Order Order[]
 
   createdAt DateTime @default(now())
@@ -78,6 +78,7 @@ model Order {
   createdAt DateTime @default(now())
   updated   DateTime @updatedAt
 }
+
 
 model ShippingAddress {
   id          String  @id @default(cuid())

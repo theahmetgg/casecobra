@@ -121,7 +121,7 @@ const DesignConfigurator = ({
         actualX,
         actualY,
         renderedDimension.width,
-        renderedDimension.height,
+        renderedDimension.height
       );
 
       const base64 = canvas.toDataURL();
@@ -174,7 +174,7 @@ const DesignConfigurator = ({
           <div
             className={cn(
               "absolute inset-0 left-[3px] top-px right-[3px] bottom-px rounded-[32px]",
-              `bg-${options.color.tw}`,
+              `bg-${options.color.tw}`
             )}
           />
         </div>
@@ -254,14 +254,14 @@ const DesignConfigurator = ({
                             "relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 active:ring-0 focus:ring-0 active:outline-none focus:outline-none border-2 border-transparent",
                             {
                               [`border-${color.tw}`]: active || checked,
-                            },
+                            }
                           )
                         }
                       >
                         <span
                           className={cn(
                             `bg-${color.tw}`,
-                            "h-8 w-8 rounded-full border border-black border-opacity-10",
+                            "h-8 w-8 rounded-full border border-black border-opacity-10"
                           )}
                         />
                       </RadioGroup.Option>
@@ -291,7 +291,7 @@ const DesignConfigurator = ({
                             {
                               "bg-zinc-100":
                                 model.label === options.model.label,
-                            },
+                            }
                           )}
                           onClick={() => {
                             setOptions((prev) => ({ ...prev, model }));
@@ -302,7 +302,7 @@ const DesignConfigurator = ({
                               "mr-2 h-4 w-4",
                               model.label === options.model.label
                                 ? "opacity-100"
-                                : "opacity-0",
+                                : "opacity-0"
                             )}
                           />
                           {model.label}
@@ -337,7 +337,7 @@ const DesignConfigurator = ({
                                 "relative block cursor-pointer rounded-lg bg-white px-6 py-4 shadow-sm border-2 border-zinc-200 focus:outline-none ring-0 focus:ring-0 outline-none sm:flex sm:justify-between",
                                 {
                                   "border-primary": active || checked,
-                                },
+                                }
                               )
                             }
                           >
@@ -375,7 +375,7 @@ const DesignConfigurator = ({
                         ))}
                       </div>
                     </RadioGroup>
-                  ),
+                  )
                 )}
               </div>
             </div>
@@ -389,7 +389,7 @@ const DesignConfigurator = ({
               <p className="font-medium whitespace-nowrap">
                 {formatPrice(
                   (BASE_PRICE + options.finish.price + options.material.price) /
-                    100,
+                    100
                 )}
               </p>
               <Button

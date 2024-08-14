@@ -10,9 +10,9 @@ import { useState, useTransition } from "react";
 import Dropzone, { FileRejection } from "react-dropzone";
 
 const Page = () => {
-  const [isDragOver, setIsDragOver] = useState<boolean>(false);
   const { toast } = useToast();
-  const [uploadProgress, setuploadProgress] = useState<number>(0);
+  const [isDragOver, setIsDragOver] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const router = useRouter();
 
   const { startUpload, isUploading } = useUploadThing("imageUploader", {
@@ -23,25 +23,29 @@ const Page = () => {
       });
     },
     onUploadProgress(p) {
-      setuploadProgress(p);
+      setUploadProgress(p);
     },
   });
 
-  const [isPending, startTransition] = useTransition();
-
   const onDropRejected = (rejectedFiles: FileRejection[]) => {
     const [file] = rejectedFiles;
+
     setIsDragOver(false);
+
     toast({
       title: `${file.file.type} type is not supported.`,
-      description: "Please a choose a PNG, JPG or JPEG image instead",
+      description: "Please choose a PNG, JPG, or JPEG image instead.",
       variant: "destructive",
     });
   };
+
   const onDropAccepted = (acceptedFiles: File[]) => {
     startUpload(acceptedFiles, { configId: undefined });
+
     setIsDragOver(false);
   };
+
+  const [isPending, startTransition] = useTransition();
 
   return (
     <div
@@ -49,7 +53,7 @@ const Page = () => {
         "relative h-full flex-1 my-16 w-full rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:rounded-2xl flex justify-center flex-col items-center",
         {
           "ring-blue-900/25 bg-blue-900/10": isDragOver,
-        },
+        }
       )}
     >
       <div className="relative flex flex-1 flex-col items-center justify-center w-full">
@@ -70,9 +74,9 @@ const Page = () => {
               {...getRootProps()}
             >
               <input {...getInputProps()} />
-              {isDragOver || isPending ? (
+              {isDragOver ? (
                 <MousePointerSquareDashed className="h-6 w-6 text-zinc-500 mb-2" />
-              ) : isUploading ? (
+              ) : isUploading || isPending ? (
                 <Loader2 className="animate-spin h-6 w-6 text-zinc-500 mb-2" />
               ) : (
                 <Image className="h-6 w-6 text-zinc-500 mb-2" />
@@ -88,21 +92,22 @@ const Page = () => {
                   </div>
                 ) : isPending ? (
                   <div className="flex flex-col items-center">
-                    <p>Redirecting , please wait...</p>
+                    <p>Redirecting, please wait...</p>
                   </div>
                 ) : isDragOver ? (
                   <p>
-                    <span className="font-semibold">Drop file </span>to upload
+                    <span className="font-semibold">Drop file</span> to upload
                   </p>
                 ) : (
                   <p>
-                    <span className="font-semibold">Click to upload </span>
-                    or drag and drop
+                    <span className="font-semibold">Click to upload</span> or
+                    drag and drop
                   </p>
                 )}
               </div>
+
               {isPending ? null : (
-                <p className="text-xs text-zinc-500">PNG,JPG,JPEG</p>
+                <p className="text-xs text-zinc-500">PNG, JPG, JPEG</p>
               )}
             </div>
           )}
